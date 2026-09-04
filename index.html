@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>江苏兆辉 · 标书智能工作台</title>
+  <style>
+    :root {
+      --bg: #f3f5f6;
+      --panel: #ffffff;
+      --line: #dde3e8;
+      --line-soft: #e9edf0;
+      --ink: #17212b;
+      --muted: #66737f;
+      --accent: #0d6b5c;
+      --accent-dark: #0a4d43;
+      --accent-soft: #e6f2ef;
+      --amber: #a66a12;
+      --red: #a33a3a;
+      --radius: 8px;
+      --shadow: 0 1px 2px rgba(15, 23, 42, .05);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      letter-spacing: 0;
+    }
+    button, input { font: inherit; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .lucide { width: 18px; height: 18px; flex: none; }
+
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 264px;
+      flex: none;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 16px; }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 8px; flex: none;
+      background: var(--accent); color: #fff;
+      display: grid; place-items: center;
+      font-size: 19px; font-weight: 700;
+    }
+    .brand-title strong { display: block; font-size: 15px; }
+    .brand-title span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .nav-list { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 11px; border-radius: 8px;
+      color: #3b4651; border: 1px solid transparent;
+      cursor: pointer; user-select: none;
+    }
+    .nav-item:hover { background: #f4f6f7; }
+    .nav-item.active {
+      background: var(--accent-soft); color: var(--accent-dark);
+      border-color: #cfe5df; font-weight: 600;
+    }
+    .nav-caption {
+      padding: 12px 11px 4px; font-size: 11px; color: var(--muted);
+      letter-spacing: .04em;
+    }
+    .sidebar-foot {
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1px solid var(--line-soft);
+      padding: 14px 8px 2px; color: var(--muted); font-size: 12px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #2b9d70; }
+
+    .main { flex: 1; min-width: 0; padding: 26px 30px 60px; }
+    .view { max-width: 1160px; margin: 0 auto; }
+
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+    .eyebrow { margin: 0 0 4px; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+    h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: 0; }
+    h1 { font-size: 25px; }
+    h2 { font-size: 17px; }
+    .page-title-sub { margin: 6px 0 0; color: var(--muted); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent); color: #fff; border: 1px solid var(--accent);
+      border-radius: 7px; padding: 8px 13px; cursor: pointer;
+      font-weight: 600; box-shadow: var(--shadow); white-space: nowrap;
+    }
+    .btn:hover { background: var(--accent-dark); }
+    .btn.ghost {
+      background: var(--panel); color: var(--ink); border-color: var(--line);
+      box-shadow: none;
+    }
+    .btn.ghost:hover { background: #f6f8f9; }
+    .btn.small { padding: 5px 9px; font-size: 12px; }
+    .btn.amber { background: #8a5a12; border-color: #8a5a12; }
+    .btn.amber:hover { background: #6e450d; }
+    .btn.danger { background: var(--red); border-color: var(--red); }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px; margin-bottom: 14px;
+    }
+    .stat-tile {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 15px; display: flex; gap: 12px; cursor: pointer; align-items: center;
+    }
+    .stat-tile:hover { border-color: #b9c8ce; }
+    .stat-icon {
+      width: 38px; height: 38px; border-radius: 8px; flex: none;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center;
+    }
+    .stat-value { font-size: 21px; font-weight: 700; line-height: 1.2; }
+    .stat-label { color: var(--muted); font-size: 12px; }
+
+    .panel {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px;
+    }
+    .work-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 14px; }
+    .quick-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #fff; border: 1px solid var(--line); border-radius: 8px;
+      padding: 11px 10px; color: var(--ink); cursor: pointer; font-weight: 600;
+    }
+    .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .score { font-size: 26px; font-weight: 800; color: var(--accent); }
+    .progress-list { display: flex; flex-direction: column; gap: 12px; }
+    .progress-row .progress-top { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+    .bar { height: 7px; background: #edf0f2; border-radius: 5px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+
+    .file-list { display: flex; flex-direction: column; }
+    .file-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 2px; border-bottom: 1px solid var(--line-soft);
+    }
+    .file-row:last-child { border-bottom: 0; }
+    .file-icon {
+      width: 30px; height: 30px; border-radius: 7px; flex: none;
+      display: grid; place-items: center; background: #f0f4f6; color: #53636e;
+    }
+    .file-icon.docx { background: #e8f1f9; color: #245a91; }
+    .file-icon.pdf { background: #fbeceb; color: #a33a3a; }
+    .file-icon.md { background: #eef3e8; color: #4f6f2f; }
+    .file-main { min-width: 0; flex: 1; }
+    .file-name { font-weight: 600; overflow-wrap: anywhere; }
+    .file-meta { color: var(--muted); font-size: 12px; margin-top: 1px; }
+    .file-actions { display: flex; gap: 5px; align-items: center; }
+    .icon-btn {
+      border: 1px solid var(--line); background: #fff; color: #41505c;
+      border-radius: 6px; width: 30px; height: 30px; display: inline-grid;
+      place-items: center; cursor: pointer; flex: none;
+    }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .empty { color: var(--muted); padding: 22px 8px; text-align: center; }
+    .segment-row {
+      display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 16px;
+      background: #eceff1; padding: 5px; border-radius: 8px; width: fit-content;
+    }
+    .segment-btn {
+      border: 0; background: transparent; padding: 7px 13px; border-radius: 6px;
+      cursor: pointer; color: #48545e; font-weight: 600;
+    }
+    .segment-btn.active { background: #fff; color: var(--accent-dark); box-shadow: var(--shadow); }
+
+    .upload-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 14px; margin-top: 16px; }
+    .dropzone {
+      border: 1.5px dashed #b7c3ca; background: #fbfcfc;
+      border-radius: var(--radius); min-height: 220px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; gap: 10px; color: var(--muted); cursor: pointer;
+      transition: border-color .15s ease, background .15s ease; padding: 20px;
+    }
+    .dropzone.drag, .dropzone:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .dropzone .icon-large { width: 42px; height: 42px; color: var(--accent); }
+    .field-label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
+    .text-input {
+      width: 100%; border: 1px solid var(--line); border-radius: 7px;
+      padding: 9px 11px; background: #fff; color: var(--ink);
+    }
+    .result-list { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .result-item {
+      display: flex; gap: 8px; align-items: center; padding: 6px 2px;
+      font-size: 13px; border-bottom: 1px solid var(--line-soft);
+    }
+    .ok { color: var(--accent); }
+    .err { color: var(--red); }
+    .analysis-note {
+      display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+      background: #eef5ef; color: #245a3a; border: 1px solid #d3e6d7;
+      border-radius: 8px; padding: 9px 12px; margin-top: 12px; font-size: 13px;
+    }
+    .analysis-note a { color: #245a3a; font-weight: 700; margin-left: auto; }
+
+    .library-grid { display: grid; grid-template-columns: 220px 1fr; gap: 14px; align-items: start; }
+    .dir-tabs { display: flex; flex-direction: column; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; }
+    .dir-tab {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 10px; border-radius: 7px; border: 0; background: transparent;
+      color: #3d4a54; cursor: pointer; font-weight: 600; gap: 8px;
+    }
+    .dir-tab:hover { background: #f4f6f7; }
+    .dir-tab.active { background: var(--accent-soft); color: var(--accent-dark); }
+    .dir-tab span:first-child { display: flex; align-items: center; gap: 7px; }
+    .count-pill { background: #e7ebed; border-radius: 20px; font-size: 11px; padding: 1px 7px; color: #53636e; }
+
+    .templates-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .template-card {
+      display: flex; flex-direction: column; gap: 12px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px;
+    }
+    .template-title { display: flex; align-items: center; gap: 11px; }
+    .template-icon {
+      width: 44px; height: 44px; border-radius: 8px; display: grid; place-items: center;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .template-name { font-size: 17px; font-weight: 700; }
+    .template-desc { color: var(--muted); font-size: 13px; }
+    .template-actions { display: flex; gap: 8px; margin-top: auto; }
+
+    .md-body { max-width: 960px; }
+    .md-body h1, .md-body h2, .md-body h3, .md-body h4 {
+      margin: 22px 0 10px; line-height: 1.35;
+    }
+    .md-body h1 { font-size: 24px; border-bottom: 1px solid var(--line-soft); padding-bottom: 8px; }
+    .md-body h2 { font-size: 19px; margin-top: 26px; }
+    .md-body h3 { font-size: 16px; color: var(--accent-dark); }
+    .md-body p { margin: 8px 0; }
+    .md-body ul, .md-body ol { padding-left: 22px; }
+    .md-body li { margin: 4px 0; }
+    .md-body li input { margin-right: 8px; transform: translateY(1px); }
+    .md-body blockquote {
+      margin: 10px 0; padding: 9px 14px; border-left: 3px solid var(--amber);
+      background: #fbf6ea; color: #57482d; border-radius: 0 6px 6px 0;
+    }
+    .md-body table {
+      border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px;
+    }
+    .md-body th, .md-body td {
+      border: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top;
+    }
+    .md-body th { background: #f0f3f4; font-weight: 700; }
+    .md-body code {
+      background: #eef1f3; border-radius: 4px; padding: 1px 5px; font-size: 12px;
+    }
+    .md-body pre {
+      background: #f4f6f7; border: 1px solid var(--line-soft); border-radius: 6px;
+      padding: 12px; overflow: auto;
+    }
+    .md-body pre code { background: transparent; padding: 0; }
+    .md-back { margin-bottom: 14px; }
+
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #18242e; color: #fff; padding: 10px 16px; border-radius: 8px;
+      opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18); font-size: 13px;
+    }
+    .toast.show { opacity: 1; }
+    .loading { padding: 60px 20px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 1040px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .work-grid, .upload-grid, .library-grid { grid-template-columns: 1fr; }
+      .quick-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .templates-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .layout { display: block; }
+      .sidebar {
+        position: relative; width: 100%; height: auto;
+        border-right: 0; border-bottom: 1px solid var(--line);
+        padding: 10px;
+      }
+      .brand { padding: 4px 8px 10px; }
+      .nav-list { flex-direction: row; flex-wrap: wrap; overflow: visible; }
+      .nav-item { padding: 7px 9px; }
+      .nav-item .nav-text { display: none; }
+      .nav-caption { display: none; }
+      .sidebar-foot { display: none; }
+      .main { padding: 16px 12px 60px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .quick-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">兆</div>
+        <div class="brand-title">
+          <strong>江苏兆辉防腐科技</strong>
+          <span>标书智能工作台</span>
+        </div>
+      </div>
+      <div class="nav-list" id="nav-list"></div>
+      <div class="sidebar-foot"><span class="dot"></span><span>本地工作区运行中</span></div>
+    </aside>
+    <main class="main">
+      <div class="view" id="view"></div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="/vendor/marked.min.js"></script>
+  <script src="/vendor/lucide.min.js"></script>
+  <script>
+    const NAV = [
+      { id: "home", label: "工作台", icon: "layout-dashboard", hash: "#/home" },
+      { id: "upload", label: "资料投喂", icon: "upload-cloud", hash: "#/upload" },
+      { id: "library", label: "本地资料库", icon: "folder-open", hash: "#/library" },
+      { id: "templates", label: "标书模板", icon: "file-text", hash: "#/templates" },
+      { id: "analysis", label: "标书分析", icon: "sparkles", mdPath: "06_投标记录/历史标书分析/README.md" },
+      { id: "md-requirements", label: "需求拆解", icon: "clipboard-list", mdPath: "07_标书规范/需求拆解表.md" },
+      { id: "md-check", label: "交付核对", icon: "check-circle", mdPath: "07_标书规范/交付核对清单.md" },
+      { id: "md-experience", label: "投标经验库", icon: "book-open", mdPath: "06_投标记录/经验库.md" },
+      { id: "md-guide", label: "使用说明", icon: "book", mdPath: "README.md" }
+    ];
+    const UPLOAD_ORDER = ["historical", "profile", "materials", "tender"];
+
+    let data = null;
+    let uploadDir = "tender";
+    let libraryDir = "historical";
+    let toastTimer = null;
+
+    const el = (id) => document.getElementById(id);
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+
+    function sizeText(bytes) {
+      if (!bytes && bytes !== 0) return "";
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / 1024 / 1024).toFixed(1) + " MB";
+    }
+
+    function dateText(ms) {
+      if (!ms) return "";
+      return new Date(ms).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function extIcon(ext) {
+      if (ext === "docx" || ext === "doc") return "file-text";
+      if (ext === "pdf") return "file-text";
+      if (ext === "md") return "file-text";
+      if (["png", "jpg", "jpeg"].includes(ext)) return "file-image";
+      if (["xls", "xlsx"].includes(ext)) return "file-text";
+      return "file";
+    }
+
+    function extClass(ext) {
+      if (ext === "docx" || ext === "doc") return "docx";
+      if (ext === "pdf") return "pdf";
+      if (ext === "md") return "md";
+      return "";
+    }
+
+    function dirByKey(key) {
+      return data ? data.dirs.find((d) => d.key === key) : null;
+    }
+
+    async function refreshState() {
+      const resp = await fetch("/api/state", { cache: "no-store" });
+      if (!resp.ok) throw new Error("state error");
+      data = await resp.json();
+    }
+
+    function toast(message) {
+      const box = el("toast");
+      box.textContent = message;
+      box.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => box.classList.remove("show"), 2200);
+    }
+
+    function renderNav(activeId) {
+      const nav = el("nav-list");
+      nav.innerHTML = NAV.map((item) => {
+        const href = item.hash || "#/md/" + encodeURIComponent(item.mdPath);
+        const active = item.id === activeId ? " active" : "";
+        return `<a class="nav-item${active}" href="${href}">
+          <i data-lucide="${item.icon}"></i><span class="nav-text">${item.label}</span>
+        </a>`;
+      }).join("");
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function currentRoute() {
+      const hash = location.hash.replace(/^#\/?/, "");
+      const qIndex = hash.indexOf("?");
+      const query = qIndex >= 0 ? hash.slice(qIndex + 1) : "";
+      const base = qIndex >= 0 ? hash.slice(0, qIndex) : hash;
+      if (base.startsWith("md/")) {
+        return { view: "md", path: decodeURIComponent(base.slice(3)), query };
+      }
+      return { view: base || "home", path: null, query };
+    }
+
+    function goMd(path) {
+      location.hash = "#/md/" + encodeURIComponent(path);
+    }
+
+    function resolveRel(baseDir, href) {
+      const clean = href.split("#")[0].split("?")[0];
+      if (!clean) return "";
+      const start = clean.startsWith("/") ? [] : (baseDir ? baseDir.split("/").filter(Boolean) : []);
+      const parts = start.concat(clean.split("/").filter((p) => p && p !== "."));
+      const stack = [];
+      for (const part of parts) {
+        if (part === "..") stack.pop();
+        else stack.push(part);
+      }
+      if (stack.length && !stack[stack.length - 1].includes(".")) stack.push("README.md");
+      return stack.join("/");
+    }
+
+    function homeView() {
+      const dirs = data.dirs;
+      const byKey = Object.fromEntries(dirs.map((d) => [d.key, d]));
+      const tiles = [
+        { key: "historical", icon: "archive", label: "历史标书" },
+        { key: "profile", icon: "building-2", label: "企业档案" },
+        { key: "materials", icon: "book-open-text", label: "素材库" },
+        { key: "tender", icon: "file-plus-2", label: "招标文件" }
+      ];
+      const tileHtml = tiles.map((tile) => {
+        const d = byKey[tile.key];
+        return `<div class="stat-tile" data-go-lib="${tile.key}">
+          <div class="stat-icon"><i data-lucide="${tile.icon}"></i></div>
+          <div>
+            <div class="stat-value">${d ? d.count : 0}</div>
+            <div class="stat-label">${tile.label}</div>
+          </div>
+        </div>`;
+      }).join("");
+
+      const readinessRows = [
+        { key: "profile", label: "企业档案", ready: (byKey.profile?.count || 0) > 0 },
+        { key: "historical", label: "历史标书", ready: (byKey.historical?.count || 0) >= 1 },
+        { key: "materials", label: "素材库", ready: (byKey.materials?.count || 0) > 0 },
+        { key: "tender", label: "待处理招标文件", ready: (byKey.tender?.count || 0) >= 1 }
+      ];
+      const readyCount = readinessRows.filter((r) => r.ready).length;
+      const progressHtml = readinessRows.map((r) => `
+        <div class="progress-row">
+          <div class="progress-top"><span>${r.label}</span><span>${r.ready ? "就绪" : "待投喂"}</span></div>
+          <div class="bar"><span style="width:${r.ready ? 100 : 0}%"></span></div>
+        </div>`).join("");
+
+      const allFiles = dirs.flatMap((d) => d.files.slice(0, 4));
+      allFiles.sort((a, b) => b.mtime - a.mtime);
+      const recent = allFiles.slice(0, 7);
+      const recentHtml = recent.length ? recent.map((f) => `
+        <div class="file-row">
+          <div class="file-icon ${extClass(f.ext)}"><i data-lucide="${extIcon(f.ext)}"></i></div>
+          <div class="file-main">
+            <div class="file-name">${esc(f.name)}</div>
+            <div class="file-meta">${esc(f.rel)} · ${sizeText(f.size)} · ${dateText(f.mtime)}</div>
+          </div>
+          <div class="file-actions">
+            ${f.ext === "md" ? `<button class="icon-btn" data-open-md="${esc(f.rel)}"><i data-lucide="book-open"></i></button>` : ""}
+            <a class="icon-btn" href="${esc(f.url)}" download title="打开文件"><i data-lucide="download"></i></a>
+          </div>
+        </div>`).join("") : `<div class="empty">暂无文件</div>`;
+
+      return `
+        <div class="page-head">
+          <div>
+            <p class="eyebrow">江苏兆辉防腐科技</p>
+            <h1>标书智能工作台</h1>
+          </div>
+          <div class="toolbar">
+            <button class="btn ghost" id="refresh-home"><i data-lucide="refresh-cw"></i>刷新</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">${tileHtml}</div>
+
+        <div class="work-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>资料就绪</h2>
+              <span class="score">${readyCount}/4</span>
+            </div>
+            <div class="progress-list">${progressHtml}</div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>最近文件</h2></div>
+            <div class="file-list">${recentHtml}</div>
+          </section>
+        </div>
+
+        <div class="quick-grid">
+          <button class="quick-btn" data-go-upload="historical"><i data-lucide="archive"></i>历史标书</button>
+          <button class="quick-btn" data-go-upload="profile"><i data-lucide="building-2"></i>企业档案</button>
+          <button class="quick-btn" data-go-upload="tender"><i data-lucide="file-plus-2"></i>招标文件</button>
+          <button class="quick-btn" data-go="#/templates"><i data-lucide="file-text"></i>标书模板</button>
+        </div>`;
+    }
+
+    function uploadView(queryDir) {
+      if (queryDir && UPLOAD_ORDER.includes(queryDir)) uploadDir = queryDir;
+      const current = dirByKey(uploadDir) || {};
+      const segments = UPLOAD_ORDER.map((key) => {
+        const d = dirByKey(key);
+        return `<button class="segment-btn${key === uploadDir ? " active" : ""}" data-upload-dir="${key}">
+          ${d ? d.label : key}
+        </button>`;
+      }).join("");
+      const showFolder = uploadDir === "historical";
+      const accept = {
+        historical: ".doc,.docx,.pdf,.txt",
+        profile: ".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.md",
+        materials: ".doc,.docx,.pdf,.txt,.md",
+        tender: ".pdf,.doc,.docx,.zip,.rar"
+      }[uploadDir] || "";
+      const currentFiles = (current.files || []).slice(0, 12);
+      return `
+        <div class="page-head">
+          <div>
+            <p class="eyebrow">本地资料库</p>
+            <h1>资料投喂</h1>
+          </div>
+          <button class="btn ghost" id="copy-generate"><i data-lucide="copy"></i>复制生成指令</button>
+        </div>
+        <div class="segment-row">${segments}</div>
+        <div class="upload-grid">
+          <section class="panel">
+            <div class="dropzone" id="dropzone">
+              <i class="icon-large" data-lucide="cloud-upload"></i>
+              <div><strong>拖入 ${current.label || ""} 文件</strong></div>
+              <button class="btn" id="choose-files"><i data-lucide="upload"></i>选择文件</button>
+              <input type="file" id="file-input" multiple hidden accept="${accept}">
+            </div>
+            ${showFolder ? `
+              <label class="field-label">项目文件夹名称（可选）</label>
+              <input class="text-input" id="upload-folder" placeholder="例如：某化工储罐项目">
+              <div class="analysis-note">
+                <i data-lucide="sparkles"></i><span>投喂后自动分析并生成总结</span>
+                <a href="#/md/${encodeURIComponent("06_投标记录/历史标书分析/README.md")}">查看分析报告</a>
+              </div>
+            ` : ""}
+            <div class="result-list" id="upload-results"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>${current.label || ""}</h2><span>${current.count || 0} 个文件</span></div>
+            <div class="file-list">
+              ${currentFiles.length ? currentFiles.map((f) => `
+                <div class="file-row">
+                  <div class="file-icon ${extClass(f.ext)}"><i data-lucide="${extIcon(f.ext)}"></i></div>
+                  <div class="file-main">
+                    <div class="file-name">${esc(f.name)}</div>
+                    <div class="file-meta">${esc(f.rel)} · ${dateText(f.mtime)}</div>
+                  </div>
+                  ${f.ext === "md" ? `<button class="icon-btn" data-open-md="${esc(f.rel)}"><i data-lucide="book-open"></i></button>` : ""}
+                  <a class="icon-btn" href="${esc(f.url)}" download title="打开文件"><i data-lucide="download"></i></a>
+                </div>`).join("") : `<div class="empty">还没有文件</div>`}
+            </div>
+          </section>
+        </div>`;
+    }
+
+    async function uploadFiles(files) {
+      const list = el("upload-results");
+      const folderInput = el("upload-folder");
+      const folder = folderInput ? folderInput.value.trim() : "";
+      for (const file of Array.from(files)) {
+        const row = document.createElement("div");
+        row.className = "result-item";
+        row.innerHTML = `<span class="file-icon ${extClass(file.name.split(".").pop().toLowerCase())}"><i data-lucide="file"></i></span>
+          <span class="file-main"><strong>${esc(file.name)}</strong><div class="file-meta">${sizeText(file.size)} · 上传中</div></span>`;
+        list.appendChild(row);
+        const params = new URLSearchParams({ dir: uploadDir, name: file.name });
+        if (folder) params.set("folder", folder);
+        try {
+          const resp = await fetch("/api/upload?" + params.toString(), { method: "POST", body: file });
+          const payload = await resp.json().catch(() => ({}));
+          if (!resp.ok || !payload.ok) throw new Error(payload.error || "上传失败");
+          row.querySelector(".file-meta").textContent = payload.file.rel + " · 已保存";
+          row.querySelector(".file-icon").classList.add("ok");
+        } catch (err) {
+          row.querySelector(".file-meta").textContent = err.message;
+          row.classList.add("err");
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      await refreshState();
+      toast("已保存到本地工作区");
+      if (currentRoute().view === "upload") renderRoute();
+    }
+
+    function libraryView(queryDir) {
+      if (queryDir && data.dirs.some((d) => d.key === queryDir)) libraryDir = queryDir;
+      const current = dirByKey(libraryDir);
+      const tabs = data.dirs.map((d) => `
+        <button class="dir-tab${d.key === libraryDir ? " active" : ""}" data-library-dir="${d.key}">
+          <span>${d.label}</span><span class="count-pill">${d.count}</span>
+        </button>`).join("");
+      const files = current ? current.files : [];
+      return `
+        <div class="page-head">
+          <div>
+            <p class="eyebrow">本地工作区</p>
+            <h1>资料库</h1>
+          </div>
+          <button class="btn ghost" data-go="#/upload?dir=${libraryDir}"><i data-lucide="upload"></i>上传文件</button>
+        </div>
+        <div class="library-grid">
+          <div class="dir-tabs">${tabs}</div>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>${current ? current.label : ""}</h2>
+              <span>${current ? current.count + " 个文件 · " + sizeText(current.totalSize) : ""}</span>
+            </div>
+            <div class="file-list">
+              ${files.length ? files.map((f) => `
+                <div class="file-row">
+                  <div class="file-icon ${extClass(f.ext)}"><i data-lucide="${extIcon(f.ext)}"></i></div>
+                  <div class="file-main">
+                    <div class="file-name">${esc(f.name)}</div>
+                    <div class="file-meta">${esc(f.rel)} · ${sizeText(f.size)} · ${dateText(f.mtime)}</div>
+                  </div>
+                  <div class="file-actions">
+                    ${f.ext === "md" ? `<button class="icon-btn" data-open-md="${esc(f.rel)}" title="查看内容"><i data-lucide="book-open"></i></button>` : ""}
+                    <a class="icon-btn" href="${esc(f.url)}" download title="打开文件"><i data-lucide="download"></i></a>
+                  </div>
+                </div>`).join("") : `<div class="empty">暂无文件</div>`}
+            </div>
+          </section>
+        </div>`;
+    }
+
+    function templatesView() {
+      const spec = dirByKey("spec");
+      const templateFiles = (spec?.files || []).filter((f) => f.rel.includes("/模板/") && ["docx", "doc"].includes(f.ext));
+      const markdownSpecs = (spec?.files || []).filter((f) => f.ext === "md" && !f.rel.includes("/模板/"));
+      const templateCards = templateFiles.length ? templateFiles.map((f) => `
+        <div class="template-card">
+          <div class="template-title">
+            <div class="template-icon"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="template-name">${esc(f.name.replace(".docx", "").replace(".doc", ""))}</div>
+              <div class="template-desc">${esc(f.rel)}</div>
+            </div>
+          </div>
+          <div class="template-actions">
+            <a class="btn small" href="${esc(f.url)}" download><i data-lucide="download"></i>打开 Word</a>
+          </div>
+        </div>`).join("") : `<div class="panel"><div class="empty">模板文件尚未生成</div></div>`;
+
+      return `
+        <div class="page-head">
+          <div>
+            <p class="eyebrow">标准骨架</p>
+            <h1>标书模板</h1>
+          </div>
+        </div>
+        <div class="templates-grid">${templateCards}</div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-head"><h2>规范与清单</h2></div>
+          <div class="file-list">
+            ${markdownSpecs.map((f) => `
+              <div class="file-row">
+                <div class="file-icon md"><i data-lucide="book-open"></i></div>
+                <div class="file-main"><div class="file-name">${esc(f.name)}</div><div class="file-meta">${esc(f.rel)}</div></div>
+                <button class="btn small ghost" data-open-md="${esc(f.rel)}"><i data-lucide="book-open"></i>查看</button>
+              </div>`).join("")}
+          </div>
+        </div>`;
+    }
+
+    async function markdownView(mdPath) {
+      const loading = `<div class="loading">读取中…</div>`;
+      el("view").innerHTML = loading;
+      try {
+        const resp = await fetch("/api/md?path=" + encodeURIComponent(mdPath), { cache: "no-store" });
+        const payload = await resp.json();
+        if (!resp.ok) throw new Error(payload.error || "读取失败");
+        const name = mdPath.split("/").pop();
+        el("view").innerHTML = `
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">${esc(mdPath)}</p>
+              <h1>${esc(name)}</h1>
+            </div>
+            <button class="btn ghost" data-go="#/home"><i data-lucide="home"></i>工作台</button>
+          </div>
+          <article class="panel md-body" id="md-body">${payload.html}</article>`;
+        bindMarkdown(mdPath);
+        bindView();
+      } catch (err) {
+        el("view").innerHTML = `<div class="empty">${esc(err.message)}</div>`;
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function bindMarkdown(mdPath) {
+      const baseDir = mdPath.split("/").slice(0, -1).join("/");
+      const body = el("md-body");
+      if (!body) return;
+      body.querySelectorAll("a[href]").forEach((link) => {
+        const raw = link.getAttribute("href") || "";
+        if (/^(https?:|mailto:|tel:)/i.test(raw) || raw.startsWith("#") || raw.startsWith("/vendor/")) return;
+        const resolved = resolveRel(baseDir, raw);
+        if (resolved && resolved !== mdPath) {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            goMd(resolved);
+          });
+        }
+      });
+      const checkKey = "bid-check:" + mdPath;
+      body.querySelectorAll("input[type=checkbox]").forEach((input, index) => {
+        input.checked = localStorage.getItem(checkKey + ":" + index) === "1";
+        input.addEventListener("change", () => {
+          localStorage.setItem(checkKey + ":" + index, input.checked ? "1" : "0");
+        });
+      });
+    }
+
+    function handleAction(event) {
+      const target = event.target && event.target.closest
+        ? event.target.closest("[data-go],[data-go-upload],[data-go-lib],[data-open-md],[data-upload-dir],[data-library-dir],[data-goto]")
+        : null;
+      if (!target) return;
+      const prevent = () => {
+        if (target.tagName === "A") event.preventDefault();
+      };
+      if (target.hasAttribute("data-open-md")) {
+        prevent();
+        goMd(target.getAttribute("data-open-md"));
+        return;
+      }
+      if (target.hasAttribute("data-library-dir")) {
+        prevent();
+        libraryDir = target.getAttribute("data-library-dir");
+        location.hash = "#/library?dir=" + libraryDir;
+        return;
+      }
+      if (target.hasAttribute("data-upload-dir")) {
+        prevent();
+        location.hash = "#/upload?dir=" + target.getAttribute("data-upload-dir");
+        return;
+      }
+      if (target.hasAttribute("data-go-upload")) {
+        prevent();
+        location.hash = "#/upload?dir=" + target.getAttribute("data-go-upload");
+        return;
+      }
+      if (target.hasAttribute("data-go-lib")) {
+        prevent();
+        location.hash = "#/library?dir=" + target.getAttribute("data-go-lib");
+        return;
+      }
+      if (target.hasAttribute("data-go") || target.hasAttribute("data-goto")) {
+        prevent();
+        location.hash = target.getAttribute("data-go") || target.getAttribute("data-goto");
+      }
+    }
+
+    function bindView() {}
+
+    document.addEventListener("click", handleAction);
+
+    function renderRoute() {
+      if (!data) {
+        el("view").innerHTML = `<div class="loading">正在连接本地工作区…</div>`;
+        return;
+      }
+      const route = currentRoute();
+      let activeId = "home";
+      if (route.view === "upload") {
+        activeId = "upload";
+        el("view").innerHTML = uploadView(new URLSearchParams(route.query).get("dir") || "");
+      } else if (route.view === "library") {
+        activeId = "library";
+        el("view").innerHTML = libraryView(new URLSearchParams(route.query).get("dir") || "");
+      } else if (route.view === "templates") {
+        activeId = "templates";
+        el("view").innerHTML = templatesView();
+      } else if (route.view === "md") {
+        const navItem = NAV.find((n) => n.mdPath === route.path);
+        activeId = navItem ? navItem.id : "md-guide";
+        markdownView(route.path);
+        renderNav(activeId);
+        bindView();
+        return;
+      } else {
+        el("view").innerHTML = homeView();
+      }
+      renderNav(activeId);
+      bindView();
+      if (window.lucide) lucide.createIcons();
+
+      const refreshBtn = el("refresh-home");
+      if (refreshBtn) refreshBtn.addEventListener("click", async () => {
+        await refreshState();
+        renderRoute();
+      });
+
+      const copyBtn = el("copy-generate");
+      if (copyBtn) copyBtn.addEventListener("click", async () => {
+        const command = "按 04_招标文件 最新这份，结合 01_历史标书 和 02_企业档案，生成技术标和商务标。";
+        try {
+          await navigator.clipboard.writeText(command);
+          toast("生成指令已复制");
+        } catch {
+          window.prompt("复制以下指令：", command);
+        }
+      });
+
+      const dropzone = el("dropzone");
+      const input = el("file-input");
+      if (dropzone && input) {
+        const openPicker = () => input.click();
+        dropzone.addEventListener("click", (e) => {
+          if (!e.target.closest("#choose-files")) openPicker();
+        });
+        el("choose-files").addEventListener("click", (e) => {
+          e.stopPropagation();
+          openPicker();
+        });
+        input.addEventListener("change", () => {
+          if (input.files.length) uploadFiles(input.files);
+          input.value = "";
+        });
+        ["dragenter", "dragover"].forEach((name) => {
+          dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropzone.classList.add("drag");
+          });
+        });
+        ["dragleave", "drop"].forEach((name) => {
+          dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove("drag");
+          });
+        });
+        dropzone.addEventListener("drop", (e) => {
+          if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+        });
+      }
+    }
+
+    window.addEventListener("hashchange", () => {
+      if (data) renderRoute();
+    });
+
+    (async function init() {
+      if (location.protocol === "file:") {
+        location.replace("http://127.0.0.1:8317");
+        return;
+      }
+      renderNav("home");
+      try {
+        await refreshState();
+      } catch (err) {
+        if (location.protocol === "file:") {
+          el("view").innerHTML = `
+            <div class="panel" style="max-width:560px;margin:60px auto">
+              <h2>请使用本地服务地址打开</h2>
+              <p class="page-title-sub">这个页面需要由本地服务提供资料读取和上传能力。</p>
+              <p style="margin:16px 0"><a class="btn" href="http://127.0.0.1:8317"><i data-lucide="external-link"></i>打开 http://127.0.0.1:8317</a></p>
+            </div>`;
+          if (window.lucide) lucide.createIcons();
+        } else {
+          el("view").innerHTML = `<div class="loading">无法连接本地服务：${esc(err.message)}</div>`;
+        }
+        return;
+      }
+      renderRoute();
+    })();
+  </script>
+</body>
+</html>
